@@ -15,6 +15,7 @@ import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
 import com.gmail.nossr50.util.text.McMMOMessageType;
+import com.gmail.nossr50.util.text.StringUtils;
 import com.gmail.nossr50.util.text.TextComponentFactory;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
@@ -294,11 +295,11 @@ public class NotificationManager {
                 //TODO: Make prettier
                 HoverEvent<Component> levelMilestoneHover = Component.text(mmoPlayer.getPlayer().getName())
                         .append(Component.newline())
-                        .append(Component.text(LocalDate.now().toString()))
+                        .append(Component.text(LocalDate.now().format(StringUtils.DAY_MONTH_YEAR)))
                         .append(Component.newline())
                         .append(Component.text(
                                 mcMMO.p.getSkillTools().getLocalizedSkillName(primarySkillType)
-                                        + " reached level "+level)).color(TextColor.fromHexString(HEX_BEIGE_COLOR))
+                                        + " chegou ao nível "+level)).color(TextColor.fromHexString(HEX_BEIGE_COLOR))
                         .asHoverEvent();
 
                 String localeMessage = LocaleLoader.getString(
@@ -339,9 +340,9 @@ public class NotificationManager {
                 //TODO: Make prettier
                 HoverEvent<Component> levelMilestoneHover = Component.text(mmoPlayer.getPlayer().getName())
                         .append(Component.newline())
-                        .append(Component.text(LocalDate.now().toString()))
+                        .append(Component.text(LocalDate.now().format(StringUtils.DAY_MONTH_YEAR)))
                         .append(Component.newline())
-                        .append(Component.text("Power level has reached "+powerLevel)).color(TextColor.fromHexString(HEX_BEIGE_COLOR))
+                        .append(Component.text("Chegou ao nível de poder "+powerLevel)).color(TextColor.fromHexString(HEX_BEIGE_COLOR))
                         .asHoverEvent();
 
                 String localeMessage = LocaleLoader.getString("Broadcasts.PowerLevelUpMilestone", mmoPlayer.getPlayer().getDisplayName(), powerLevel);

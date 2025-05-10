@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,8 @@ import static java.util.Objects.requireNonNull;
  * Utility class for String operations, including formatting and caching deterministic results to improve performance.
  */
 public class StringUtils {
+
+    public static final DateTimeFormatter DAY_MONTH_YEAR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     protected static final DecimalFormat percent = new DecimalFormat("##0.00%", DecimalFormatSymbols.getInstance(Locale.US));
     protected static final DecimalFormat shortDecimal = new DecimalFormat("##0.0", DecimalFormatSymbols.getInstance(Locale.US));

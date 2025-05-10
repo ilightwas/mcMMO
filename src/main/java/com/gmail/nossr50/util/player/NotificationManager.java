@@ -7,6 +7,7 @@ import com.gmail.nossr50.datatypes.notifications.SensitiveCommandType;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.datatypes.skills.SubSkillType;
+import com.gmail.nossr50.events.skills.BroadcastSkillLevelUpEvent;
 import com.gmail.nossr50.events.skills.McMMOPlayerNotificationEvent;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
@@ -269,6 +270,10 @@ public class NotificationManager {
         return newArray;
     }
 
+    public static void fireBroadcastSkillLevelUp(Component component) {
+        Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(component));
+    }
+
     public static void processLevelUpBroadcasting(@NotNull McMMOPlayer mmoPlayer, @NotNull PrimarySkillType primarySkillType, int level) {
         if (level <= 0)
             return;
@@ -307,6 +312,7 @@ public class NotificationManager {
                 // TODO: Update system msg API
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(
                         t -> audience.sendMessage(component));
+                fireBroadcastSkillLevelUp(component);
             }
         }
     }
@@ -342,6 +348,7 @@ public class NotificationManager {
                 Component message = LegacyComponentSerializer.legacySection().deserialize(localeMessage).hoverEvent(levelMilestoneHover);
 
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(t -> audience.sendMessage(message));
+                fireBroadcastSkillLevelUp(message);
             }
         }
     }

@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public class InspectCommand implements TabExecutor {
     @Override
@@ -47,20 +48,24 @@ public class InspectCommand implements TabExecutor {
                 }
 
                 sender.sendMessage(LocaleLoader.getString("Inspect.OfflineStats", playerName));
+                boolean useExperienceBarColor = mcMMO.p.getGeneralConfig().getScoreboardExperienceBarColors();
+                BiFunction<PlayerProfile, PrimarySkillType, String> displaySkillFunc = useExperienceBarColor
+                        ? CommandUtils::displaySkillWithColor
+                        : CommandUtils::displaySkill;
 
                 sender.sendMessage(LocaleLoader.getString("Stats.Header.Gathering"));
                 for (PrimarySkillType skill : mcMMO.p.getSkillTools().GATHERING_SKILLS) {
-                    sender.sendMessage(CommandUtils.displaySkill(profile, skill));
+                    sender.sendMessage(displaySkillFunc.apply(profile, skill));
                 }
 
                 sender.sendMessage(LocaleLoader.getString("Stats.Header.Combat"));
                 for (PrimarySkillType skill : mcMMO.p.getSkillTools().COMBAT_SKILLS) {
-                    sender.sendMessage(CommandUtils.displaySkill(profile, skill));
+                    sender.sendMessage(displaySkillFunc.apply(profile, skill));
                 }
 
                 sender.sendMessage(LocaleLoader.getString("Stats.Header.Misc"));
                 for (PrimarySkillType skill : mcMMO.p.getSkillTools().MISC_SKILLS) {
-                    sender.sendMessage(CommandUtils.displaySkill(profile, skill));
+                    sender.sendMessage(displaySkillFunc.apply(profile, skill));
                 }
 
                 // Sum power level

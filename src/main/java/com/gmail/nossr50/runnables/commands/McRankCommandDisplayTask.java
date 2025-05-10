@@ -3,8 +3,10 @@ package com.gmail.nossr50.runnables.commands;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.util.CancellableRunnable;
 import com.gmail.nossr50.util.MetadataConstants;
+import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
 import com.gmail.nossr50.util.skills.SkillTools;
 import org.bukkit.command.CommandSender;
@@ -55,7 +57,9 @@ public class McRankCommandDisplayTask extends CancellableRunnable {
                 continue;
             }
             rank = skills.get(skill);
-            sender.sendMessage(LocaleLoader.getString("Commands.mcrank.Skill", mcMMO.p.getSkillTools().getLocalizedSkillName(skill), (rank == null ? LocaleLoader.getString("Commands.mcrank.Unranked") : rank)));
+            boolean useExperienceBarColor = mcMMO.p.getGeneralConfig().getScoreboardExperienceBarColors();
+            String skillColor = useExperienceBarColor ? Misc.fromBarColor(ExperienceConfig.getInstance().getExperienceBarColor(skill)).toString() : "";
+            sender.sendMessage(LocaleLoader.getString("Commands.mcrank.Skill", skillColor + mcMMO.p.getSkillTools().getLocalizedSkillName(skill), (rank == null ? LocaleLoader.getString("Commands.mcrank.Unranked") : rank)));
         }
 
         rank = skills.get(null);

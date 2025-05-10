@@ -266,6 +266,10 @@ public class GeneralConfig extends BukkitConfig {
         return config.getBoolean("Scoreboard.Rainbows", false);
     }
 
+    public boolean getScoreboardExperienceBarColors() {
+        return config.getBoolean("Scoreboard.Experience_Bar_Colors", false);
+    }
+
     public boolean getShowAbilityNames() {
         return config.getBoolean("Scoreboard.Ability_Names", true);
     }

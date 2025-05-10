@@ -5,6 +5,7 @@ import com.gmail.nossr50.datatypes.player.PlayerProfile;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.util.MetadataConstants;
 import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.player.UserManager;
@@ -216,6 +217,20 @@ public final class CommandUtils {
         return LocaleLoader.getString("Skills.Stats", LocaleLoader.getString(StringUtils.getCapitalized(skill.toString()) + ".Listener") + " ", profile.getSkillLevel(skill), profile.getSkillXpLevel(skill), profile.getXpToLevel(skill));
     }
 
+    public static String displaySkillWithColor(PlayerProfile profile, PrimarySkillType skill) {
+        String skillColor = Misc.fromBarColor(ExperienceConfig.getInstance().getExperienceBarColor(skill)).toString();
+        
+        if (SkillTools.isChildSkill(skill)) {
+            return LocaleLoader.getString("Skills.ChildStats", skillColor + LocaleLoader.getString(StringUtils.getCapitalized(skill.toString()) + ".Listener") + " ", profile.getSkillLevel(skill));
+        }
+
+        if (profile.getSkillLevel(skill) == mcMMO.p.getSkillTools().getLevelCap(skill)){
+            return LocaleLoader.getString("Skills.Stats", skillColor + LocaleLoader.getString(StringUtils.getCapitalized(skill.toString()) + ".Listener") + " ", profile.getSkillLevel(skill), profile.getSkillXpLevel(skill), LocaleLoader.getString("Skills.MaxXP"));
+        }
+        
+        return LocaleLoader.getString("Skills.Stats", skillColor + LocaleLoader.getString(StringUtils.getCapitalized(skill.toString()) + ".Listener") + " ", profile.getSkillLevel(skill), profile.getSkillXpLevel(skill), profile.getXpToLevel(skill));
+    }
+
     private static void printGroupedSkillData(Player inspectTarget, CommandSender display,
                                               String header, List<PrimarySkillType> skillGroup) {
         if (UserManager.getPlayer(inspectTarget) == null)
@@ -228,7 +243,10 @@ public final class CommandUtils {
 
         for (PrimarySkillType primarySkillType : skillGroup) {
             if (mcMMO.p.getSkillTools().doesPlayerHaveSkillPermission(inspectTarget, primarySkillType)) {
-                displayData.add(displaySkill(profile, primarySkillType));
+                String skill = mcMMO.p.getGeneralConfig().getScoreboardExperienceBarColors()
+                        ? displaySkillWithColor(profile, primarySkillType)
+                        : displaySkill(profile, primarySkillType);
+                displayData.add(skill);
             }
         }
 

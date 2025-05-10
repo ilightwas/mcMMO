@@ -9,6 +9,7 @@ import com.gmail.nossr50.events.scoreboard.McMMOScoreboardMakeboardEvent;
 import com.gmail.nossr50.events.scoreboard.ScoreboardEventReason;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.util.LogUtils;
 import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.player.UserManager;
@@ -114,9 +115,13 @@ public class ScoreboardManager {
          * Stylizes the targetBoard using our normal color scheme
          */
         else {
+            boolean useExperienceBarColor = mcMMO.p.getGeneralConfig().getScoreboardExperienceBarColors();
+
             for (PrimarySkillType primarySkillType : PrimarySkillType.values()) {
+                ChatColor chatColor = useExperienceBarColor ? Misc.fromBarColor(ExperienceConfig.getInstance().getExperienceBarColor(primarySkillType)) : ChatColor.GREEN;
+
                 // Include child skills
-                skillLabelBuilder.put(primarySkillType, getShortenedName(ChatColor.GREEN + mcMMO.p.getSkillTools().getLocalizedSkillName(primarySkillType)));
+                skillLabelBuilder.put(primarySkillType, getShortenedName(chatColor + mcMMO.p.getSkillTools().getLocalizedSkillName(primarySkillType)));
 
                 if (mcMMO.p.getSkillTools().getSuperAbility(primarySkillType) != null) {
                     abilityLabelBuilder.put(mcMMO.p.getSkillTools().getSuperAbility(primarySkillType), formatAbility(mcMMO.p.getSkillTools().getSuperAbility(primarySkillType).getLocalizedName()));

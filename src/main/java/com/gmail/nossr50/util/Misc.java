@@ -5,9 +5,11 @@ import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask;
 import com.gmail.nossr50.util.player.UserManager;
 import com.google.common.collect.ImmutableSet;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.boss.BarColor;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -207,6 +209,15 @@ public final class Misc {
             ExperienceOrb experienceOrb = (ExperienceOrb) location.getWorld().spawnEntity(location, EntityType.EXPERIENCE_ORB);
             experienceOrb.setExperience(orbExpValue);
         }
+    }
+
+    public static ChatColor fromBarColor(BarColor barColor) {
+        String str = barColor.toString();
+        if (str.equals("PINK"))
+            return ChatColor.LIGHT_PURPLE;
+        if (str.equals("PURPLE"))
+            return ChatColor.DARK_PURPLE;
+        return ChatColor.valueOf(str);
     }
 
 //    public static void hackyUnitTest(@NotNull McMMOPlayer normalPlayer) {

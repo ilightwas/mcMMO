@@ -7,27 +7,21 @@ import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 
-public class BroadcastSkillLevelUpEvent extends Event implements Cancellable {
+public class BroadcastPowerLevelUpEvent extends Event implements Cancellable {
 
     private static final @NotNull HandlerList handlers = new HandlerList();
 
     private boolean cancelled;
     private final Component message;
-    private final String skillName;
     private final int level;
 
-    public BroadcastSkillLevelUpEvent(@NotNull Component message, String skillName, int level) {
+    public BroadcastPowerLevelUpEvent(@NotNull Component message, int level) {
         this.message = message;
-        this.skillName = skillName;
         this.level = level;
     }
 
     public @NotNull Component getMessage() {
         return message;
-    }
-
-    public @NotNull String getSkillName() {
-        return skillName;
     }
 
     public int getLevel() {

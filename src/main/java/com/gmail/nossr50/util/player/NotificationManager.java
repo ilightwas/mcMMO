@@ -7,6 +7,7 @@ import com.gmail.nossr50.datatypes.notifications.SensitiveCommandType;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.datatypes.skills.SubSkillType;
+import com.gmail.nossr50.events.skills.BroadcastPowerLevelUpEvent;
 import com.gmail.nossr50.events.skills.BroadcastSkillLevelUpEvent;
 import com.gmail.nossr50.events.skills.McMMOPlayerNotificationEvent;
 import com.gmail.nossr50.locale.LocaleLoader;
@@ -271,10 +272,6 @@ public class NotificationManager {
         return newArray;
     }
 
-    public static void fireBroadcastSkillLevelUp(Component component) {
-        Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(component));
-    }
-
     public static void processLevelUpBroadcasting(@NotNull McMMOPlayer mmoPlayer, @NotNull PrimarySkillType primarySkillType, int level) {
         if (level <= 0)
             return;
@@ -290,6 +287,7 @@ public class NotificationManager {
             int remainder = level % levelInterval;
 
             if (remainder == 0) {
+                String skillName = mcMMO.p.getSkillTools().getLocalizedSkillName(primarySkillType);
                 //Grab appropriate audience
                 Audience audience = mcMMO.getAudiences().filter(getLevelUpBroadcastPredicate(mmoPlayer.getPlayer()));
                 //TODO: Make prettier
@@ -298,7 +296,7 @@ public class NotificationManager {
                         .append(Component.text(LocalDate.now().format(StringUtils.DAY_MONTH_YEAR)))
                         .append(Component.newline())
                         .append(Component.text(
-                                mcMMO.p.getSkillTools().getLocalizedSkillName(primarySkillType)
+                                skillName
                                         + " chegou ao nível "+level)).color(TextColor.fromHexString(HEX_BEIGE_COLOR))
                         .asHoverEvent();
 
@@ -313,7 +311,7 @@ public class NotificationManager {
                 // TODO: Update system msg API
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(
                         t -> audience.sendMessage(component));
-                fireBroadcastSkillLevelUp(component);
+                Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(component, skillName, level));
             }
         }
     }
@@ -349,7 +347,7 @@ public class NotificationManager {
                 Component message = LegacyComponentSerializer.legacySection().deserialize(localeMessage).hoverEvent(levelMilestoneHover);
 
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(t -> audience.sendMessage(message));
-                fireBroadcastSkillLevelUp(message);
+                Bukkit.getPluginManager().callEvent(new BroadcastPowerLevelUpEvent(message, powerLevel));
             }
         }
     }

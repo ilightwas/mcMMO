@@ -1,5 +1,6 @@
 package com.gmail.nossr50.events.skills;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -12,12 +13,18 @@ public class BroadcastPowerLevelUpEvent extends Event implements Cancellable {
     private static final @NotNull HandlerList handlers = new HandlerList();
 
     private boolean cancelled;
+    private final Player player;
     private final Component message;
     private final int level;
 
-    public BroadcastPowerLevelUpEvent(@NotNull Component message, int level) {
+    public BroadcastPowerLevelUpEvent(@NotNull Player player, @NotNull Component message, int level) {
         this.message = message;
         this.level = level;
+        this.player = player;
+    }
+
+    public @NotNull Player getPlayer() {
+        return player;
     }
 
     public @NotNull Component getMessage() {

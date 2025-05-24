@@ -311,7 +311,7 @@ public class NotificationManager {
                 // TODO: Update system msg API
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(
                         t -> audience.sendMessage(component));
-                Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(component, skillName, level));
+                Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(mmoPlayer.getPlayer(), component, skillName, level));
             }
         }
     }
@@ -347,7 +347,7 @@ public class NotificationManager {
                 Component message = LegacyComponentSerializer.legacySection().deserialize(localeMessage).hoverEvent(levelMilestoneHover);
 
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(t -> audience.sendMessage(message));
-                Bukkit.getPluginManager().callEvent(new BroadcastPowerLevelUpEvent(message, powerLevel));
+                Bukkit.getPluginManager().callEvent(new BroadcastPowerLevelUpEvent(mmoPlayer.getPlayer(), message, powerLevel));
             }
         }
     }

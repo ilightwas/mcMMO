@@ -1,5 +1,6 @@
 package com.gmail.nossr50.events.skills;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -12,14 +13,21 @@ public class BroadcastSkillLevelUpEvent extends Event implements Cancellable {
     private static final @NotNull HandlerList handlers = new HandlerList();
 
     private boolean cancelled;
+    private final Player player;
     private final Component message;
     private final String skillName;
     private final int level;
 
-    public BroadcastSkillLevelUpEvent(@NotNull Component message, String skillName, int level) {
+    public BroadcastSkillLevelUpEvent(@NotNull Player player, @NotNull Component message, @NotNull String skillName,
+            int level) {
+        this.player = player;
         this.message = message;
         this.skillName = skillName;
         this.level = level;
+    }
+
+    public @NotNull Player getPlayer() {
+        return player;
     }
 
     public @NotNull Component getMessage() {

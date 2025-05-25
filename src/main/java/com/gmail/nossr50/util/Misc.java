@@ -220,6 +220,45 @@ public final class Misc {
         return ChatColor.valueOf(str);
     }
 
+    public static String toHexColor(ChatColor color) {
+        switch (color) {
+            case BLACK:
+                return "#000000";
+            case DARK_BLUE:
+                return "#0000AA";
+            case DARK_GREEN:
+                return "#00AA00";
+            case DARK_AQUA:
+                return "#00AAAA";
+            case DARK_RED:
+                return "#AA0000";
+            case DARK_PURPLE:
+                return "#AA00AA";
+            case GOLD:
+                return "#FFAA00";
+            case GRAY:
+                return "#AAAAAA";
+            case DARK_GRAY:
+                return "#555555";
+            case BLUE:
+                return "#5555FF";
+            case GREEN:
+                return "#55FF55";
+            case AQUA:
+                return "#55FFFF";
+            case RED:
+                return "#FF5555";
+            case LIGHT_PURPLE:
+                return "#FF55FF";
+            case YELLOW:
+                return "#FFFF55";
+            case WHITE:
+                return "#FFFFFF";
+            default:
+                return "#deadc0";
+        }
+    }
+
 //    public static void hackyUnitTest(@NotNull McMMOPlayer normalPlayer) {
 //        mcMMO.p.getLogger().info("Starting hacky unit test...");
 //        int iterations = 1000000;

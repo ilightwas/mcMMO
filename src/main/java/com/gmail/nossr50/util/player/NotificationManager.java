@@ -12,6 +12,8 @@ import com.gmail.nossr50.events.skills.BroadcastSkillLevelUpEvent;
 import com.gmail.nossr50.events.skills.McMMOPlayerNotificationEvent;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.config.experience.ExperienceConfig;
+import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
@@ -311,7 +313,10 @@ public class NotificationManager {
                 // TODO: Update system msg API
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(
                         t -> audience.sendMessage(component));
-                Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(mmoPlayer.getPlayer(), component, skillName, level));
+                String skillColor = Misc.toHexColor(Misc
+                        .fromBarColor(ExperienceConfig.getInstance().getExperienceBarColor(primarySkillType)));
+                Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(mmoPlayer.getPlayer(), component,
+                        skillName, level, skillColor));
             }
         }
     }

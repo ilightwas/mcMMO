@@ -18,14 +18,16 @@ public class BroadcastSkillLevelUpEvent extends Event implements Cancellable {
     private final String skillName;
     private final int level;
     private final String skillColor;
+    private final String skillTitle;
 
     public BroadcastSkillLevelUpEvent(@NotNull Player player, @NotNull Component message, @NotNull String skillName,
-            int level, @NotNull String skillColor) {
+            int level, @NotNull String skillColor, @NotNull String skillTitle) {
         this.player = player;
         this.message = message;
         this.skillName = skillName;
         this.level = level;
         this.skillColor = skillColor;
+        this.skillTitle = skillTitle;
     }
 
     public @NotNull Player getPlayer() {
@@ -46,6 +48,10 @@ public class BroadcastSkillLevelUpEvent extends Event implements Cancellable {
 
     public @NotNull String getSkillColor() {
         return skillColor;
+    }
+
+    public @NotNull String getSkillTitle() {
+        return skillTitle;
     }
 
     @Override

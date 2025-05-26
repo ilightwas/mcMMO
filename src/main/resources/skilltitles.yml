@@ -1,0 +1,59 @@
+SkillTitleStep: 100
+PowerLevelTitleStep: 100
+
+PowerLevelTitles:
+  - 'Title'
+
+Acrobatics:
+  - 'Title'
+
+Alchemy:
+  - 'Title'
+
+Archery:
+  - 'Title'
+
+Axes:
+  - 'Title'
+
+Crossbows:
+  - 'Title'
+
+Excavation:
+  - 'Title'
+
+Fishing:
+  - 'Title'
+
+Herbalism:
+  - 'Title'
+
+Maces:
+  - 'Title'
+
+Mining:
+  - 'Title'
+
+Repair:
+  - 'Title'
+
+Salvage:
+  - 'Title'
+
+Smelting:
+  - 'Title'
+
+Swords:
+  - 'Title'
+
+Taming:
+  - 'Title'
+
+Tridents:
+  - 'Title'
+
+Unarmed:
+  - 'Title'
+
+Woodcutting:
+  - 'Title'

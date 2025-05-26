@@ -13,6 +13,7 @@ import com.gmail.nossr50.events.skills.McMMOPlayerNotificationEvent;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.config.experience.ExperienceConfig;
+import com.gmail.nossr50.config.skills.SkillTitleConfig;
 import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.sounds.SoundManager;
@@ -305,18 +306,20 @@ public class NotificationManager {
                 String localeMessage = LocaleLoader.getString(
                         "Broadcasts.LevelUpMilestone", mmoPlayer.getPlayer().getDisplayName(), level,
                         mcMMO.p.getSkillTools().getLocalizedSkillName(primarySkillType));
-                Component component = LegacyComponentSerializer
-                        .legacySection()
-                        .deserialize(localeMessage)
+
+                String skillTitleName = SkillTitleConfig.getInstance().getSkillTitleName(primarySkillType, level);
+                Component message = LegacyComponentSerializer.legacySection().deserialize(localeMessage)
+                        .append(Component.newline())
+                        .append(LegacyComponentSerializer.legacySection().deserialize(SkillTitleConfig.getSkillTitleMessage(skillTitleName)))
                         .hoverEvent(levelMilestoneHover);
 
                 // TODO: Update system msg API
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(
-                        t -> audience.sendMessage(component));
+                        t -> audience.sendMessage(message));
                 String skillColor = Misc.toHexColor(Misc
                         .fromBarColor(ExperienceConfig.getInstance().getExperienceBarColor(primarySkillType)));
-                Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(mmoPlayer.getPlayer(), component,
-                        skillName, level, skillColor));
+                Bukkit.getPluginManager().callEvent(new BroadcastSkillLevelUpEvent(mmoPlayer.getPlayer(), message,
+                        skillName, level, skillColor, skillTitleName));
             }
         }
     }
@@ -349,10 +352,15 @@ public class NotificationManager {
                         .asHoverEvent();
 
                 String localeMessage = LocaleLoader.getString("Broadcasts.PowerLevelUpMilestone", mmoPlayer.getPlayer().getDisplayName(), powerLevel);
-                Component message = LegacyComponentSerializer.legacySection().deserialize(localeMessage).hoverEvent(levelMilestoneHover);
+                String powerLevelTitleName = SkillTitleConfig.getInstance()
+                        .getPowerLevelTitleName(powerLevel);
+                Component message = LegacyComponentSerializer.legacySection().deserialize(localeMessage)
+                        .append(Component.newline())
+                        .append(LegacyComponentSerializer.legacySection().deserialize(SkillTitleConfig.getPowerLevelTitleMessage(powerLevelTitleName)))
+                        .hoverEvent(levelMilestoneHover);
 
                 mcMMO.p.getFoliaLib().getScheduler().runNextTick(t -> audience.sendMessage(message));
-                Bukkit.getPluginManager().callEvent(new BroadcastPowerLevelUpEvent(mmoPlayer.getPlayer(), message, powerLevel));
+                Bukkit.getPluginManager().callEvent(new BroadcastPowerLevelUpEvent(mmoPlayer.getPlayer(), message, powerLevel, powerLevelTitleName));
             }
         }
     }

@@ -5,6 +5,7 @@ import com.gmail.nossr50.commands.CommandManager;
 import com.gmail.nossr50.config.*;
 import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.config.party.PartyConfig;
+import com.gmail.nossr50.config.skills.SkillTitleConfig;
 import com.gmail.nossr50.config.skills.alchemy.PotionConfig;
 import com.gmail.nossr50.config.skills.repair.RepairConfigManager;
 import com.gmail.nossr50.config.skills.salvage.SalvageConfigManager;
@@ -171,6 +172,7 @@ public class mcMMO extends JavaPlugin {
             advancedConfig = new AdvancedConfig(getDataFolder());
             partyConfig = new PartyConfig(getDataFolder());
             customItemSupportConfig = new CustomItemSupportConfig(getDataFolder());
+            SkillTitleConfig.getInstance();
 
             //Store this value so other plugins can check it
             isRetroModeEnabled = generalConfig.getIsRetroMode();

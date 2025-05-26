@@ -16,11 +16,13 @@ public class BroadcastPowerLevelUpEvent extends Event implements Cancellable {
     private final Player player;
     private final Component message;
     private final int level;
+    private final String powerLevelTitle;
 
-    public BroadcastPowerLevelUpEvent(@NotNull Player player, @NotNull Component message, int level) {
+    public BroadcastPowerLevelUpEvent(@NotNull Player player, @NotNull Component message, int level, @NotNull String powerLevelTitle) {
         this.message = message;
         this.level = level;
         this.player = player;
+        this.powerLevelTitle = powerLevelTitle;
     }
 
     public @NotNull Player getPlayer() {
@@ -33,6 +35,10 @@ public class BroadcastPowerLevelUpEvent extends Event implements Cancellable {
 
     public int getLevel() {
         return level;
+    }
+
+    public @NotNull String getPowerLevelTitle() {
+        return powerLevelTitle;
     }
 
     @Override

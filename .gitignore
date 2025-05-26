@@ -56,3 +56,4 @@
 # Atlassian Stuff
 /atlassian-ide-plugin.xml
 /nulllocale_override.properties
+.env

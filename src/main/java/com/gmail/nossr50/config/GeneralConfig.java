@@ -986,8 +986,19 @@ public class GeneralConfig extends BukkitConfig {
         return config.getInt("General.Level_Up_Chat_Broadcasts.Milestone_Interval", 100);
     }
 
+    public boolean shouldLevelUpBroadcastsUseRandomIntervals() {
+        return config.getBoolean("General.Level_Up_Chat_Broadcasts.Use_Random_Intervals", false);
+    }
+
+    public int getLevelUpBroadcastIntervalSeed() {
+        return config.getInt("General.Level_Up_Chat_Broadcasts.Interval_Seed", 1);
+    }
+
     public boolean shouldPowerLevelUpBroadcasts() {
         return config.getBoolean("General.Level_Up_Chat_Broadcasts.Broadcast_Powerlevels.Enabled", true);
+    }
+    public boolean shouldPowerLevelUpBroadcastsUseRandomIntervals() {
+        return config.getBoolean("General.Level_Up_Chat_Broadcasts.Broadcast_Powerlevels.Use_Random_Intervals", false);
     }
 
     public boolean shouldPowerLevelUpBroadcastToConsole() {

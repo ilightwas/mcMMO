@@ -17,6 +17,7 @@ General:
             Enabled: true
             # How often to broadcast, you can change this to 1 to always broadcast a level up event, a setting of 100 will limit it to every 100 levels (for example level 100, level 200, etc)
             Milestone_Interval: 100
+            Use_Random_Intervals: false
             Broadcast_Targets:
                 # Send the message to the console as well
                 Send_To_Console: true
@@ -31,6 +32,8 @@ General:
                     Restricted_Radius: 100
         # How often to broadcast, you can change this to 1 to always broadcast a level up event, a setting of 100 will limit it to every 100 levels (for example level 100, level 200, etc)
         Milestone_Interval: 100
+        Use_Random_Intervals: false
+        Interval_Seed: 1
         Broadcast_Targets:
             # Send the message to the console as well
             Send_To_Console: true

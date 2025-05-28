@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class NotificationManager {
 
@@ -275,6 +276,73 @@ public class NotificationManager {
         return newArray;
     }
 
+    public static boolean shouldBroadcast(final int level, final int levelInterval, final UUID uuid, final int extra1, final int extra2) {    
+        /*
+         * Blocks are the range from 0 to levelInterval - 1
+         * e.g: for 100, 0 to 99
+         */
+        int block = level / levelInterval;
+        
+        /*
+         * At which block to start
+         * e.g: level 450, levelInterval 100
+         * block = 4; 4 * 100 = start at 400
+         */
+        int blockStart = block * levelInterval;
+
+        /*
+         * offset will be between 0 and levelInterval - 1
+         */
+        int offset = generateOffset(block, levelInterval, uuid, extra1, extra2);
+        // mcMMO.p.getLogger().info(String.format("Block: %d, Offset: %d, BlockStart: %d", block, offset, blockStart));
+        
+        /* offset will be between [0 - 99], e.g: 68
+        * level(450) == 400+68 -> false
+        * On next level up the offset will be the same until
+        * the broadcast will not happen until the player hits level 468
+        * next broadcast will happen only on the next block e.g: 500
+        */
+        return level == blockStart + offset;
+    }
+
+    public static int generateOffset(int block, int levelInterval, UUID uuid, int extra1, int extra2) {
+        if (levelInterval < 1) {
+            throw new IllegalArgumentException("Interval must be at least 1.");
+        }
+
+        long MSB = uuid.getMostSignificantBits();
+        long LSB = uuid.getLeastSignificantBits();
+        int x = 67;
+
+        /*
+         * UUIDs already have a good entropy
+         * Use both 32 bytes of the MSB and seed the early bits
+         */
+        x = x ^ (int) (MSB & 0xFFFFFFFF);
+        x = x * 0x1F + (int) ((MSB >>> 32));
+
+        /*
+         * Insert the seed values
+         * with lesser entropy
+         * and mix them with the early
+         * 64 bytes from the MSB
+         */
+        x = x * 0x1F + block;
+        x = x * 0x1F ^ extra1;
+        x = x * 0x1F + extra2;
+        x = ((x << 5) - x) ^ levelInterval;
+
+        /*
+         * Use the last 64 bytes of the LSB
+         * to wrap the values and increase entropy
+         */
+        x = x ^ (int) (LSB & 0xFFFFFFFF);
+        x = x * 0x1F + (int) (LSB >>> 32);
+
+        /* Grab a value in the range of levelInterval */
+        return (Math.abs(x) % levelInterval);
+    }
+
     public static void processLevelUpBroadcasting(@NotNull McMMOPlayer mmoPlayer, @NotNull PrimarySkillType primarySkillType, int level) {
         if (level <= 0)
             return;
@@ -286,10 +354,17 @@ public class NotificationManager {
                 return;
             }
 
+            boolean shouldBroadcast = false;
             int levelInterval = mcMMO.p.getGeneralConfig().getLevelUpBroadcastInterval();
-            int remainder = level % levelInterval;
+            if (!mcMMO.p.getGeneralConfig().shouldLevelUpBroadcastsUseRandomIntervals()) {
+                shouldBroadcast = level % levelInterval == 0;
+            } else {
+                int seed = mcMMO.p.getGeneralConfig().getLevelUpBroadcastIntervalSeed();
+                // mcMMO.p.getLogger().info(String.format("Level: %d, Interval: %d, Seed: %d, Skill: %s, SkillHash: %s", level, levelInterval, seed, primarySkillType.name(), primarySkillType.hashCode()));
+                shouldBroadcast = shouldBroadcast(level, levelInterval, mmoPlayer.getPlayer().getUniqueId(), primarySkillType.hashCode(), seed);
+            }
 
-            if (remainder == 0) {
+            if (shouldBroadcast) {
                 String skillName = mcMMO.p.getSkillTools().getLocalizedSkillName(primarySkillType);
                 //Grab appropriate audience
                 Audience audience = mcMMO.getAudiences().filter(getLevelUpBroadcastPredicate(mmoPlayer.getPlayer()));
@@ -337,10 +412,17 @@ public class NotificationManager {
                 return;
             }
 
+            boolean shouldBroadcast = false;
             int levelInterval = mcMMO.p.getGeneralConfig().getPowerLevelUpBroadcastInterval();
-            int remainder = powerLevel % levelInterval;
 
-            if (remainder == 0) {
+            if (!mcMMO.p.getGeneralConfig().shouldPowerLevelUpBroadcastsUseRandomIntervals()) {
+                shouldBroadcast = powerLevel % levelInterval == 0;
+            } else {
+                int seed = mcMMO.p.getGeneralConfig().getLevelUpBroadcastIntervalSeed();
+                shouldBroadcast = shouldBroadcast(powerLevel, levelInterval, mmoPlayer.getPlayer().getUniqueId(), 9000, seed);
+            }
+
+            if (shouldBroadcast) {
                 //Grab appropriate audience
                 Audience audience = mcMMO.getAudiences().filter(getPowerLevelUpBroadcastPredicate(mmoPlayer.getPlayer()));
                 //TODO: Make prettier

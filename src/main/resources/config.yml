@@ -235,6 +235,7 @@ Hardcore:
             Tridents: false
             Crossbows: false
             Maces: false
+            Spears: false
     Vampirism:
         Leech_Percentage: 5.0
         Level_Threshold: 0
@@ -255,6 +256,7 @@ Hardcore:
             Tridents: false
             Crossbows: false
             Maces: false
+            Spears: false
 
 #
 #  Settings for SMP Mods
@@ -392,6 +394,8 @@ Skills:
         # Always catch fish, even when treasure is found
         Extra_Fish: false
         Lure_Modifier: 4.0
+        # Makes items with conflicting enchantments obtainable through Magic Hunter, such as armor pieces with multiple types of protection
+        Allow_Conflicting_Enchants: false
     Herbalism:
         Level_Cap: 0
         Prevent_AFK_Leveling: true
@@ -433,6 +437,10 @@ Skills:
         Enabled_For_PVP: true
         Enabled_For_PVE: true
         Level_Cap: 0
+    Spears:
+        Enabled_For_PVP: true
+        Enabled_For_PVE: true
+        Level_Cap: 0
     Taming:
         Enabled_For_PVP: true
         Enabled_For_PVE: true
@@ -466,7 +474,7 @@ Skills:
         Enabled_For_PVE: true
         Level_Cap: 0
         Block_Cracker:
-            SmoothBrick_To_CrackedBrick: true
+            Allow_Block_Cracker: true
         # When using Unarmed, picked up items will automatically get moved to a free slot instead of going in the slot
         # of your hand. Should item pickup be disabled when your entire inventory - except for your hand - is full?
         Item_Pickup_Disabled_Full_Inventory: true
@@ -484,6 +492,7 @@ Green_Thumb_Replanting_Crops:
     Potatoes: true
     Beetroots: true
     Cocoa: true
+    Sweet_Berry_Bush: true
 #
 #  Settings for Double Drops
 ###

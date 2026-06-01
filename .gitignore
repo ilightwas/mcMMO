@@ -57,3 +57,10 @@
 /atlassian-ide-plugin.xml
 /nulllocale_override.properties
 .env
+
+# HTML
+/html
+*.html
+
+# md
+*.md

@@ -57,14 +57,13 @@ import com.gmail.nossr50.util.Misc;
 import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.TransientEntityTracker;
 import com.gmail.nossr50.util.TransientMetadataTools;
+import com.gmail.nossr50.util.MinecraftGameVersionFactory;
 import com.gmail.nossr50.util.blockmeta.ChunkManager;
 import com.gmail.nossr50.util.blockmeta.ChunkManagerFactory;
 import com.gmail.nossr50.util.blockmeta.UserBlockTracker;
 import com.gmail.nossr50.util.commands.CommandRegistrationManager;
-import com.gmail.nossr50.util.compat.CompatibilityManager;
 import com.gmail.nossr50.util.experience.FormulaManager;
-import com.gmail.nossr50.util.platform.PlatformManager;
-import com.gmail.nossr50.util.platform.ServerSoftwareType;
+import com.gmail.nossr50.util.platform.MinecraftGameVersion;
 import com.gmail.nossr50.util.player.PlayerLevelUtils;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
@@ -79,6 +78,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.shatteredlands.shatt.backup.ZipLibrary;
 import org.bstats.bukkit.Metrics;
@@ -87,16 +87,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class mcMMO extends JavaPlugin {
     /* Managers & Services */
-    private static PlatformManager platformManager;
     private static ChunkManager chunkManager;
     private static RepairableManager repairableManager;
     private static SalvageableManager salvageableManager;
@@ -109,6 +106,7 @@ public class mcMMO extends JavaPlugin {
     private static ChatManager chatManager;
     private static CommandManager commandManager; //ACF
     private static TransientEntityTracker transientEntityTracker;
+    private static MinecraftGameVersion minecraftGameVersion;
 
     private SkillTools skillTools;
 
@@ -172,8 +170,19 @@ public class mcMMO extends JavaPlugin {
             //Filter out any debug messages (if debug/verbose logging is not enabled)
             getLogger().setFilter(new LogFilter(this));
 
-            //Platform Manager
-            platformManager = new PlatformManager();
+            // Determine game version before moving forward
+            final String versionStr = Bukkit.getVersion();
+            try {
+                minecraftGameVersion = MinecraftGameVersionFactory.calculateGameVersion(versionStr);
+            } catch (Exception e) {
+                // if anything goes wrong with our calculations, assume they are running the minimum
+                // supported version and log the error
+                getLogger().warning("Could not determine Minecraft version from"
+                        + " server software version string: " + versionStr +
+                        ", Please report this bug to the devs!");
+                e.printStackTrace();
+                minecraftGameVersion = new MinecraftGameVersion(1, 20, 5);
+            }
 
             //Folia lib plugin instance
             foliaLib = new FoliaLib(this);
@@ -246,17 +255,16 @@ public class mcMMO extends JavaPlugin {
             checkForOutdatedAPI();
 
             if (serverAPIOutdated) {
-                foliaLib.getImpl().runTimer(
+                foliaLib.getScheduler().runTimer(
                         () -> getLogger().severe(
-                                "You are running an outdated version of "
-                                        + platformManager.getServerSoftware()
+                                "You are potentially running an outdated version of your server software"
                                         + ", mcMMO will not work unless you update to a newer version!"),
                         20, 20 * 60 * 30);
-
-                if (platformManager.getServerSoftware() == ServerSoftwareType.CRAFT_BUKKIT) {
-                    foliaLib.getImpl().runTimer(
+                if (!minecraftGameVersion.isAtLeast(1, 20, 4)) {
+                    foliaLib.getScheduler().runTimer(
                             () -> getLogger().severe(
-                                    "We have detected you are using incompatible server software, our best guess is that you are using CraftBukkit. mcMMO requires Spigot or Paper, if you are not using CraftBukkit, you will still need to update your custom server software before mcMMO will work."),
+                                    "This version of mcMMO requires at least Minecraft 1.20.4 to"
+                                            + " function properly, please update your software or use an older version of mcMMO!"),
                             20, 20 * 60 * 30);
                 }
             } else {
@@ -308,13 +316,11 @@ public class mcMMO extends JavaPlugin {
                 }
             }
         } catch (Throwable t) {
-            getLogger().severe("There was an error while enabling mcMMO!");
+            getLogger().log(Level.SEVERE, "There was an error while enabling mcMMO!", t);
 
-            if (!(t instanceof ExceptionInInitializerError)) {
-                t.printStackTrace();
-            } else {
-                getLogger().info(
-                        "Please do not replace the mcMMO jar while the server is running.");
+            if (t instanceof ExceptionInInitializerError) {
+                getLogger().info("Please do not replace the mcMMO jar while the server"
+                        + " is running.");
             }
 
             getServer().getPluginManager().disablePlugin(this);
@@ -356,15 +362,15 @@ public class mcMMO extends JavaPlugin {
 
     private void checkForOutdatedAPI() {
         try {
-            Class<?> checkForClass = Class.forName("org.bukkit.event.block.BlockDropItemEvent");
-            checkForClass.getMethod("getItems");
+            Class<?> blockDropItemEvent = Class.forName("org.bukkit.event.block.BlockDropItemEvent");
+            blockDropItemEvent.getMethod("getItems");
             Class.forName("net.md_5.bungee.api.chat.BaseComponent");
+            // 1.20.4 checks
+            Class<?> entityDamageEvent = Class.forName("org.bukkit.event.entity.EntityDamageEvent");
+            entityDamageEvent.getMethod("getDamageSource");
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             serverAPIOutdated = true;
-            String software = platformManager.getServerSoftwareStr();
-            getLogger().severe(
-                    "You are running an older version of " + software
-                            + " that is not compatible with mcMMO, update your server software!");
+            getLogger().severe("Your server software is missing APIs that mcMMO requires to function properly, please update your server software!");
         }
     }
 
@@ -401,7 +407,7 @@ public class mcMMO extends JavaPlugin {
             formulaManager.saveFormula();
             chunkManager.closeAll();
         } catch (Exception e) {
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, "An error occurred while disabling mcMMO!", e);
         }
 
         if (generalConfig.getBackupsEnabled()) {
@@ -507,10 +513,6 @@ public class mcMMO extends JavaPlugin {
         return upgradeManager;
     }
 
-    public static @Nullable CompatibilityManager getCompatibilityManager() {
-        return platformManager.getCompatibilityManager();
-    }
-
     @Deprecated
     public static void setDatabaseManager(DatabaseManager databaseManager) {
         mcMMO.databaseManager = databaseManager;
@@ -589,7 +591,6 @@ public class mcMMO extends JavaPlugin {
         TreasureConfig.getInstance();
         FishingTreasureConfig.getInstance();
         HiddenConfig.getInstance();
-        mcMMO.p.getAdvancedConfig();
 
         // init potion config
         potionConfig = new PotionConfig();
@@ -599,16 +600,15 @@ public class mcMMO extends JavaPlugin {
         SoundConfig.getInstance();
         RankConfig.getInstance();
 
-        List<Repairable> repairables = new ArrayList<>();
-
         // Load repair configs, make manager, and register them at this time
-        repairables.addAll(new RepairConfigManager(this).getLoadedRepairables());
+        final List<Repairable> repairables = new ArrayList<>(
+                new RepairConfigManager(this).getLoadedRepairables());
         repairableManager = new SimpleRepairableManager(repairables.size());
         repairableManager.registerRepairables(repairables);
 
         // Load salvage configs, make manager and register them at this time
         SalvageConfigManager sManager = new SalvageConfigManager(this);
-        List<Salvageable> salvageables = sManager.getLoadedSalvageables();
+        final List<Salvageable> salvageables = sManager.getLoadedSalvageables();
         salvageableManager = new SimpleSalvageableManager(salvageables.size());
         salvageableManager.registerSalvageables(salvageables);
     }
@@ -758,10 +758,6 @@ public class mcMMO extends JavaPlugin {
         return worldBlacklist;
     }
 
-    public static PlatformManager getPlatformManager() {
-        return platformManager;
-    }
-
     public static BukkitAudiences getAudiences() {
         return audiences;
     }
@@ -841,5 +837,14 @@ public class mcMMO extends JavaPlugin {
 
     public @NotNull FoliaLib getFoliaLib() {
         return foliaLib;
+    }
+
+    /**
+     * Get the {@link MinecraftGameVersion}
+     *
+     * @return the {@link MinecraftGameVersion}
+     */
+    public static MinecraftGameVersion getMinecraftGameVersion() {
+        return minecraftGameVersion;
     }
 }

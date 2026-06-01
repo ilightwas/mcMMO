@@ -21,15 +21,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GeneralConfig extends BukkitConfig {
+    private @Nullable Material repairAnvilMaterial;
+    private @Nullable Material salvageAnvilMaterial;
 
     public GeneralConfig(@NotNull File dataFolder) {
         super("config.yml", dataFolder);
+        loadKeys();
         validate();
     }
 
     @Override
     protected void loadKeys() {
-
+        repairAnvilMaterial = Material.matchMaterial(
+                config.getString("Skills.Repair.Anvil_Material", "IRON_BLOCK"));
+        salvageAnvilMaterial = Material.matchMaterial(
+                config.getString("Skills.Salvage.Anvil_Material", "GOLD_BLOCK"));
     }
 
     @Override
@@ -246,7 +252,13 @@ public class GeneralConfig extends BukkitConfig {
     }
 
     public int getMobHealthbarTime() {
-        return Math.max(1, config.getInt("Mob_Healthbar.Display_Time", 3));
+        final int configured = config.getInt("Mob_Healthbar.Display_Time", 3);
+        // Negative values (previously used as an undocumented "permanent display" mode) are no
+        // longer supported. Clamp them to 20× the default (60 s) so the healthbar still clears.
+        if (configured < 0) {
+            return 60;
+        }
+        return Math.max(1, configured);
     }
 
     /* Scoreboards */
@@ -426,10 +438,6 @@ public class GeneralConfig extends BukkitConfig {
 
     public boolean getMySQLSSL() {
         return config.getBoolean("MySQL.Server.SSL", true);
-    }
-
-    public boolean getMySQLDebug() {
-        return config.getBoolean("MySQL.Debug", false);
     }
 
     public boolean getMySQLPublicKeyRetrieval() {
@@ -808,6 +816,10 @@ public class GeneralConfig extends BukkitConfig {
         return config.getDouble("Skills.Fishing.Lure_Modifier", 4.0D);
     }
 
+    public boolean getFishingAllowConflictingEnchants() {
+        return config.getBoolean("Skills.Fishing.Allow_Conflicting_Enchants", false);
+    }
+
     /* Mining */
     public Material getDetonatorItem() {
         return Material.matchMaterial(
@@ -833,8 +845,7 @@ public class GeneralConfig extends BukkitConfig {
     }
 
     public @Nullable Material getRepairAnvilMaterial() {
-        return Material.matchMaterial(
-                config.getString("Skills.Repair.Anvil_Material", "IRON_BLOCK"));
+        return repairAnvilMaterial;
     }
 
     public boolean getRepairConfirmRequired() {
@@ -867,8 +878,7 @@ public class GeneralConfig extends BukkitConfig {
     }
 
     public @Nullable Material getSalvageAnvilMaterial() {
-        return Material.matchMaterial(
-                config.getString("Skills.Salvage.Anvil_Material", "GOLD_BLOCK"));
+        return salvageAnvilMaterial;
     }
 
     public boolean getSalvageConfirmRequired() {
@@ -876,8 +886,8 @@ public class GeneralConfig extends BukkitConfig {
     }
 
     /* Unarmed */
-    public boolean getUnarmedBlockCrackerSmoothbrickToCracked() {
-        return config.getBoolean("Skills.Unarmed.Block_Cracker.SmoothBrick_To_CrackedBrick", true);
+    public boolean isBlockCrackerAllowed() {
+        return config.getBoolean("Skills.Unarmed.Block_Cracker.Allow_Block_Cracker", true);
     }
 
     public boolean getUnarmedItemPickupDisabled() {
